@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeGen AI - Editor</title>
+    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="/styles/notifications.css">
+    <link rel="stylesheet" href="/styles/loading.css">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fira+Code&display=swap" rel="stylesheet">
+    
+    <!-- Monaco Editor -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.js"></script>
+</head>
+<body>
+    <!-- Editor Interface -->
+    <div class="coding-interface">
+        <!-- ... (rest of editor interface) ... -->
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Monaco Editor Setup
+        require.config({
+            paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' },
+            'vs/css': { disabled: true }
+        });
+
+        window.MonacoEnvironment = {
+            getWorkerUrl: function() {
+                return `data:text/javascript;charset=utf-8,${encodeURIComponent(`
+                    self.MonacoEnvironment = {
+                        baseUrl: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/'
+                    };
+                    importScripts('https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/base/worker/workerMain.js');
+                `)}`;
+            }
+        };
+    </script>
+
+    <!-- Load utility classes first -->
+    <script src="/js/notifications.js"></script>
+    <script src="/js/loading.js"></script>
+    <script src="/js/theme.js"></script>
+    
+    <!-- Load editor components -->
+    <script src="/js/file-explorer.js"></script>
+    <script src="/js/preview.js"></script>
+    <script src="script.js"></script>
+</body>
+</html> 

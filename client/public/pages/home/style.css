@@ -1,0 +1,19 @@
+.homepage {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+    color: white;
+}
+
+.homepage-hero {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+    background: radial-gradient(circle at center, rgba(74, 144, 226, 0.1) 0%, transparent 70%);
+    padding-top: 64px;
+}
+
+/* ... (rest of home-specific styles) ... */ 
