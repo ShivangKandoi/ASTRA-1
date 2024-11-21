@@ -1,339 +1,224 @@
-class App {
-    constructor() {
-        this.initializeElements();
-        this.setupEventListeners();
-        this.setupTheme();
-        this.notifications = new NotificationSystem();
-        this.loading = new LoadingSpinner();
-    }
+document.addEventListener('DOMContentLoaded', () => {
+    const consoleOutput = document.getElementById('consoleOutput');
+    const userInput = document.getElementById('userInput');
+    const generateBtn = document.getElementById('generateBtn');
+    const chatMessages = document.getElementById('chat-messages');
+    const componentBtn = document.getElementById('componentBtn');
+    const fullProjectBtn = document.getElementById('fullProjectBtn');
+    const runCodeBtn = document.getElementById('runCode');
+    const saveCodeBtn = document.getElementById('saveCode');
 
-    initializeElements() {
-        // Buttons
-        this.themeToggle = document.getElementById('theme-toggle');
-        this.startCodingBtn = document.getElementById('start-coding');
-        this.generateBtn = document.querySelector('.btn-generate');
-        
-        // Sections
-        this.homepage = document.getElementById('homepage');
-        this.codingInterface = document.getElementById('coding-interface');
-        this.mainInterface = document.getElementById('main-interface');
-        
-        // Forms
-        this.generationForm = document.getElementById('generation-form');
-        
-        // Auth elements
-        this.authButtons = document.getElementById('auth-buttons');
-        this.userProfile = document.getElementById('user-profile');
-        
-        // Add modal elements
-        this.loginModal = document.getElementById('login-modal');
-        this.signupModal = document.getElementById('signup-modal');
-        this.loginBtn = document.querySelector('.btn-login');
-        this.signupBtn = document.querySelector('.btn-signup');
-        this.modalCloseButtons = document.querySelectorAll('.modal-close');
-        this.switchToSignup = document.getElementById('switch-to-signup');
-        this.switchToLogin = document.getElementById('switch-to-login');
+    let generationType = 'component';
 
-        // Chat messages container
-        this.chatMessages = document.getElementById('chat-messages');
-    }
+    // Add initial greeting
+    addMessage('ai', 'Hello! I\'m your AI coding assistant. I can help you write, understand, and improve code. What would you like to create?');
 
-    setupEventListeners() {
-        if (this.themeToggle) {
-            this.themeToggle.addEventListener('click', () => this.toggleTheme());
-        }
-        
-        if (this.startCodingBtn) {
-            this.startCodingBtn.addEventListener('click', () => {
-                this.homepage.style.display = 'none';
-                this.codingInterface.classList.add('active');
-                this.mainInterface.classList.remove('hidden');
-            });
-        }
-        
-        if (this.generationForm) {
-            this.generationForm.addEventListener('submit', (e) => this.handleCodeGeneration(e));
-        }
-        
-        // Modal event listeners
-        if (this.loginBtn) {
-            this.loginBtn.addEventListener('click', () => this.showModal('login'));
-        }
-        if (this.signupBtn) {
-            this.signupBtn.addEventListener('click', () => this.showModal('signup'));
-        }
-        
-        this.modalCloseButtons.forEach(button => {
-            button.addEventListener('click', () => this.hideModals());
-        });
-
-        if (this.switchToSignup) {
-            this.switchToSignup.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.showModal('signup');
-            });
-        }
-        
-        if (this.switchToLogin) {
-            this.switchToLogin.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.showModal('login');
-            });
-        }
-
-        // Form submissions
-        const loginForm = document.getElementById('login-form');
-        const signupForm = document.getElementById('signup-form');
-        
-        if (loginForm) {
-            loginForm.addEventListener('submit', (e) => this.handleLogin(e));
-        }
-        if (signupForm) {
-            signupForm.addEventListener('submit', (e) => this.handleSignup(e));
-        }
-
-        // Close modals when clicking outside
-        window.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal')) {
-                this.hideModals();
-            }
-        });
-
-        // Generation options buttons
-        document.querySelectorAll('.option-button').forEach(button => {
-            button.addEventListener('click', (e) => {
-                e.preventDefault();
-                document.querySelectorAll('.option-button').forEach(btn => 
-                    btn.classList.remove('active')
-                );
-                button.classList.add('active');
-            });
-        });
-
-        // Handle textarea enter key
-        const projectDescription = document.getElementById('project-description');
-        if (projectDescription) {
-            projectDescription.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    this.generationForm.dispatchEvent(new Event('submit'));
+    // Console output handling
+    const console = {
+        log: (...args) => {
+            const output = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            appendToConsole(output, 'log');
+        },
+        error: (...args) => {
+            const output = args.map(arg => {
+                if (arg instanceof Error) {
+                    return `${arg.name}: ${arg.message}\n${arg.stack}`;
                 }
-            });
+                return typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg);
+            }).join(' ');
+            appendToConsole(output, 'error');
+        },
+        warn: (...args) => {
+            const output = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            appendToConsole(output, 'warning');
         }
+    };
+
+    function appendToConsole(text, type = 'log') {
+        const line = document.createElement('div');
+        switch(type) {
+            case 'error':
+                line.className = 'console-line error';
+                text = `🔴 ${text}`;
+                break;
+            case 'warning':
+                line.className = 'console-line warning';
+                text = `⚠️ ${text}`;
+                break;
+            default:
+                line.className = 'console-line success';
+                text = `✓ ${text}`;
+        }
+        line.textContent = text;
+        consoleOutput.appendChild(line);
+        consoleOutput.scrollTop = consoleOutput.scrollHeight;
     }
 
-    setupTheme() {
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        this.themeToggle.textContent = savedTheme === 'light' ? '🌙' : '☀️';
+    function clearConsole() {
+        consoleOutput.innerHTML = '';
     }
 
-    toggleTheme() {
-        const currentTheme = document.documentElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-        
-        document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
-        this.themeToggle.textContent = newTheme === 'light' ? '🌙' : '☀️';
-    }
+    // Save code with feedback
+    saveCodeBtn.addEventListener('click', () => {
+        if (window.currentFile && window.monacoEditor) {
+            const content = window.monacoEditor.getValue();
+            window.currentFile.content = content;
+            window.fileExplorer.updateFileContent(window.currentFile.id, content);
+            addMessage('ai', `I've saved your changes to ${window.currentFile.name}. Is there anything else you'd like me to help you with?`);
+        } else {
+            addMessage('ai', 'Please create a new file first before saving. Would you like me to help you create one?');
+        }
+    });
 
-    async handleCodeGeneration(e) {
-        e.preventDefault();
+    // Run code with feedback
+    runCodeBtn.addEventListener('click', async () => {
+        clearConsole();
+        const code = window.monacoEditor ? window.monacoEditor.getValue() : '';
         
-        const description = document.getElementById('project-description')?.value;
-        const activeButton = document.querySelector('.option-button.active');
-        
-        if (!description) {
-            this.notifications.error('Please enter a project description');
+        if (!code.trim()) {
+            console.warn('No code to execute');
             return;
         }
 
-        if (!activeButton) {
-            this.notifications.error('Please select a generation type');
-            return;
-        }
-
-        const generationType = activeButton.dataset.type;
-
-        // Add user message to chat
-        this.addChatMessage(description, 'user');
-
-        this.loading.show();
+        console.log('Executing code...');
         
         try {
-            console.log('Sending request with:', { description, generationType });
+            // Extract dependencies from comments
+            const dependencies = code.match(/\/\/ @requires (.+)/g)?.map(dep => 
+                dep.replace('// @requires ', '').trim()
+            ) || [];
 
+            const response = await fetch('/api/run', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    code,
+                    language: window.currentFile?.type || 'javascript',
+                    dependencies
+                })
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                console.log(data.output);
+            } else {
+                console.error('Execution error:', data.error);
+            }
+        } catch (error) {
+            console.error('Error running code:', error);
+        }
+    });
+
+    // Generate code with conversation
+    generateBtn.addEventListener('click', async () => {
+        const description = userInput.value.trim();
+        if (!description) {
+            addMessage('ai', 'Please describe what you\'d like me to create.');
+            return;
+        }
+
+        addMessage('user', description);
+        addMessage('ai', 'Generating code...');
+
+        try {
             const response = await fetch('/api/generate', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     description,
-                    generationType
+                    generationType,
+                    filename: window.currentFile?.name || ''
                 })
             });
-            
-            const data = await response.json();
-            console.log('Server response:', data);
-            
-            if (!response.ok) {
-                throw new Error(data.message || data.error || 'Failed to generate code');
-            }
-            
-            if (data.success && data.code) {
-                // Add AI response to chat
-                this.addChatMessage('Here\'s your generated code:', 'ai');
-                
-                if (window.codeEditor) {
-                    // Handle different code response formats
-                    if (typeof data.code === 'string') {
-                        window.codeEditor.setCode(data.code);
-                    } else if (data.code.code) {
-                        // Component response
-                        window.codeEditor.setCode(data.code.code);
-                        if (data.code.language) {
-                            window.codeEditor.setLanguage(data.code.language);
-                        }
-                    } else {
-                        // Full project response
-                        const formattedCode = JSON.stringify(data.code, null, 2);
-                        window.codeEditor.setCode(formattedCode);
-                    }
-                } else {
-                    console.error('Code editor not initialized');
-                    throw new Error('Code editor not available');
-                }
-                
-                this.notifications.success('Code generated successfully!');
-            } else {
-                throw new Error('Invalid response format from server');
-            }
-            
-        } catch (error) {
-            console.error('Error generating code:', error);
-            this.notifications.error(error.message || 'Failed to generate code');
-            this.addChatMessage('Sorry, I encountered an error while generating the code. Please try again.', 'ai');
-        } finally {
-            this.loading.hide();
-            const projectDescription = document.getElementById('project-description');
-            if (projectDescription) {
-                projectDescription.value = '';
-            }
-        }
-    }
-
-    isAuthenticated() {
-        return !!localStorage.getItem('token');
-    }
-
-    showModal(type) {
-        this.hideModals();
-        if (type === 'login') {
-            this.loginModal.classList.remove('hidden');
-            this.loginModal.classList.add('active');
-        } else {
-            this.signupModal.classList.remove('hidden');
-            this.signupModal.classList.add('active');
-        }
-    }
-
-    hideModals() {
-        this.loginModal.classList.add('hidden');
-        this.loginModal.classList.remove('active');
-        this.signupModal.classList.add('hidden');
-        this.signupModal.classList.remove('active');
-    }
-
-    async handleLogin(e) {
-        e.preventDefault();
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
-
-        try {
-            const response = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email, password })
-            });
 
             const data = await response.json();
-
+            
             if (data.success) {
-                localStorage.setItem('token', data.token);
-                this.notifications.success('Logged in successfully!');
-                this.hideModals();
-                this.updateAuthUI(data.user);
+                window.monacoEditor.setValue(data.code);
+                addMessage('ai', 'I\'ve generated the code based on your description. Would you like me to explain how it works or make any modifications?');
             } else {
-                throw new Error(data.message);
+                const errorMessage = data.error || 'Unknown error occurred';
+                addMessage('ai', `I encountered an error while generating the code: ${errorMessage}. Would you like to try a different approach?`);
             }
         } catch (error) {
-            this.notifications.error(error.message);
-        }
-    }
-
-    async handleSignup(e) {
-        e.preventDefault();
-        const username = document.getElementById('signup-username').value;
-        const email = document.getElementById('signup-email').value;
-        const password = document.getElementById('signup-password').value;
-        const confirmPassword = document.getElementById('signup-confirm-password').value;
-
-        if (password !== confirmPassword) {
-            this.notifications.error('Passwords do not match');
-            return;
+            addMessage('ai', `I apologize, but I encountered an error: ${error.message}. Would you like to try again or take a different approach?`);
         }
 
-        try {
-            const response = await fetch('/api/auth/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username, email, password })
-            });
+        userInput.value = '';
+    });
 
-            const data = await response.json();
-
-            if (data.success) {
-                localStorage.setItem('token', data.token);
-                this.notifications.success('Account created successfully!');
-                this.hideModals();
-                this.updateAuthUI(data.user);
-            } else {
-                throw new Error(data.message);
-            }
-        } catch (error) {
-            this.notifications.error(error.message);
-        }
-    }
-
-    updateAuthUI(user) {
-        if (user) {
-            this.authButtons.classList.add('hidden');
-            this.userProfile.classList.remove('hidden');
-            document.getElementById('username').textContent = user.username;
-        } else {
-            this.authButtons.classList.remove('hidden');
-            this.userProfile.classList.add('hidden');
-            document.getElementById('username').textContent = '';
-        }
-    }
-
-    addChatMessage(message, type = 'user') {
-        const chatMessages = document.getElementById('chat-messages');
+    function addMessage(type, content) {
         const messageDiv = document.createElement('div');
-        messageDiv.className = `chat-message ${type}`;
-        messageDiv.textContent = message;
+        messageDiv.className = `chat-message ${type}-message`;
+        
+        // Format code blocks in messages
+        if (content.includes('```')) {
+            const formattedContent = content.replace(/```([\s\S]*?)```/g, 
+                (match, code) => `<pre class="code-block">${code.trim()}</pre>`);
+            messageDiv.innerHTML = formattedContent;
+        } else {
+            messageDiv.textContent = content;
+        }
+        
         chatMessages.appendChild(messageDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
-}
 
-// Initialize the app when the DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    window.app = new App();
+    // Component/Project toggle with feedback
+    componentBtn.addEventListener('click', () => {
+        generationType = 'component';
+        componentBtn.classList.add('bg-blue-600');
+        fullProjectBtn.classList.remove('bg-blue-600');
+        addMessage('ai', 'I\'ll help you create a component. What would you like to build?');
+    });
+
+    fullProjectBtn.addEventListener('click', () => {
+        generationType = 'project';
+        fullProjectBtn.classList.add('bg-blue-600');
+        componentBtn.classList.remove('bg-blue-600');
+        addMessage('ai', 'I\'ll help you create a full project. What kind of project would you like to build?');
+    });
+
+    // Copy code with feedback
+    document.getElementById('copyCode').addEventListener('click', () => {
+        const code = window.monacoEditor ? window.monacoEditor.getValue() : '';
+        navigator.clipboard.writeText(code);
+        addMessage('ai', 'I\'ve copied the code to your clipboard. Is there anything else you\'d like me to help you with?');
+    });
+
+    // Download code with feedback
+    document.getElementById('downloadCode').addEventListener('click', () => {
+        const code = window.monacoEditor ? window.monacoEditor.getValue() : '';
+        const blob = new Blob([code], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = window.currentFile?.name || 'generated-code.txt';
+        a.click();
+        URL.revokeObjectURL(url);
+        addMessage('ai', `I've prepared your code for download as ${a.download}. Would you like to make any changes before working with it?`);
+    });
+
+    // Clear console with feedback
+    document.getElementById('clearConsole').addEventListener('click', () => {
+        clearConsole();
+        addMessage('ai', 'I\'ve cleared the console output for you. Ready for the next task!');
+    });
+
+    // Handle user input with Enter key
+    userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            generateBtn.click();
+        }
+    });
 }); 

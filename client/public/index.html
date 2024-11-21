@@ -3,235 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASTRA-1 AI - Intelligent Code Generation</title>
-    
-    <!-- Styles -->
-    <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/notifications.css">
-    <link rel="stylesheet" href="styles/loading.css">
-    
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fira+Code&display=swap" rel="stylesheet">
-    
-    <!-- Monaco Editor -->
+    <title>ASTRA-1 AI Code Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.js"></script>
 </head>
 <body>
-    <!-- Homepage -->
-    <div class="homepage" id="homepage">
-        <nav class="navbar">
-            <div class="logo">Astra-1 AI</div>
-            <div class="nav-links">
-                <button id="theme-toggle">🌙</button>
-                <div id="auth-buttons">
-                    <button class="btn-login">Login</button>
-                    <button class="btn-signup">Sign Up</button>
-                </div>
-                <div id="user-profile" class="hidden">
-                    <span id="username"></span>
-                    <button class="btn-logout">Logout</button>
-                </div>
+    <div class="main-container">
+        <!-- Files Section -->
+        <div class="files-section">
+            <div class="files-header">
+                <div class="section-title">Files</div>
+                <button class="new-file-button">New File</button>
             </div>
-        </nav>
-
-        <div class="homepage-hero">
-            <h1 class="homepage-title">ASTRA-1 AI</h1>
-            <p class="homepage-subtitle">
-                Transform your ideas into code with the power of AI. Generate, test, and deploy code in seconds.
-            </p>
-            <div class="homepage-buttons">
-                <button id="start-coding" class="homepage-btn homepage-btn-primary">Start Coding</button>
-                <button class="homepage-btn homepage-btn-secondary">Learn More</button>
-            </div>
+            <div id="file-explorer"></div>
         </div>
 
-        <section class="features-section">
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">🚀</div>
-                    <h3 class="feature-title">Instant Code Generation</h3>
-                    <p class="feature-description">
-                        Generate production-ready code in seconds using advanced AI technology.
-                    </p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🔍</div>
-                    <h3 class="feature-title">Real-Time Preview</h3>
-                    <p class="feature-description">
-                        Test and preview your code instantly with our built-in editor.
-                    </p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">💾</div>
-                    <h3 class="feature-title">Save & Share</h3>
-                    <p class="feature-description">
-                        Save your projects and share them with the community.
-                    </p>
-                </div>
-            </div>
-        </section>
-    </div>
-
-    <!-- Coding Interface -->
-    <div class="coding-interface" id="coding-interface">
-        <section id="main-interface" class="hidden">
-            <!-- File Explorer Section (Left) -->
-            <div class="file-explorer">
-                <div class="file-explorer-header">
-                    <span>Files</span>
-                    <button id="new-file">+</button>
-                </div>
-                <div class="file-list" id="file-list">
-                    <!-- Files will be added here -->
+        <!-- Code Editor Section -->
+        <div class="editor-section">
+            <!-- Initial State (No File) -->
+            <div id="no-file-message" class="flex-1 flex items-center justify-center text-gray-500">
+                <div class="text-center">
+                    <p class="text-lg mb-2">No file is currently open</p>
+                    <p class="text-sm">Create a new file or select one from the file explorer</p>
                 </div>
             </div>
 
-            <!-- Editor Section (Center) -->
-            <div class="editor-section">
+            <!-- Editor View (Hidden initially) -->
+            <div id="editor-view" class="h-full flex flex-col" style="display: none;">
+                <!-- Editor Header -->
                 <div class="editor-header">
-                    <span>Code Editor</span>
+                    <div class="section-title">Code Editor</div>
                     <div class="editor-actions">
-                        <button id="btn-run">Run Code</button>
-                        <button id="btn-copy">Copy</button>
-                        <button id="btn-download">Download</button>
-                        <button id="btn-save">Save</button>
+                        <button id="runCode" class="editor-button run">Run Code</button>
+                        <button id="copyCode" class="editor-button copy">Copy</button>
+                        <button id="downloadCode" class="editor-button download">Download</button>
+                        <button id="saveCode" class="editor-button save">Save</button>
                     </div>
                 </div>
+
+                <!-- Monaco Editor -->
                 <div id="monaco-editor"></div>
-                
-                <!-- Preview Section (Overlay) -->
-                <div class="preview-section">
-                    <div class="preview-header">
-                        <span>Preview</span>
-                        <button id="btn-close-preview">&times;</button>
-                    </div>
-                    <div class="preview-frame">
-                        <iframe id="preview-iframe" sandbox="allow-scripts allow-same-origin"></iframe>
-                    </div>
-                    <div class="console-output">
-                        <div class="console-header">Console Output</div>
-                        <div id="console-content"></div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Chat Section (Right) -->
-            <div class="chat-section">
-                <div class="chat-messages" id="chat-messages">
-                    <div class="chat-message ai">
-                        Hello! I'm your AI coding assistant. What would you like me to help you create today?
+                <!-- Console Output -->
+                <div class="console-section">
+                    <div class="console-header">
+                        <div class="section-title">Console Output</div>
+                        <button id="clearConsole" class="clear-button">Clear</button>
                     </div>
-                </div>
-                <div class="chat-input-container">
-                    <form id="generation-form">
-                        <textarea 
-                            id="project-description" 
-                            placeholder="Describe what you want to create..."
-                            rows="3"
-                        ></textarea>
-                        <div class="generation-options">
-                            <button type="button" class="option-button active" data-type="component">
-                                Component
-                            </button>
-                            <button type="button" class="option-button" data-type="full-project">
-                                Full Project
-                            </button>
-                        </div>
-                        <button type="submit" class="btn-generate">
-                            Generate Code <span class="icon">→</span>
-                        </button>
-                    </form>
+                    <div id="consoleOutput"></div>
                 </div>
             </div>
-        </section>
-    </div>
+        </div>
 
-    <!-- Auth Modals -->
-    <div id="login-modal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Login</h2>
-                <button class="modal-close">&times;</button>
+        <!-- AI Assistant Section -->
+        <div class="assistant-section">
+            <div class="assistant-content">
+                <div class="section-title">AI Assistant</div>
+                <div id="chat-messages"></div>
+                <textarea 
+                    id="userInput" 
+                    placeholder="Describe what you want to create..."
+                    rows="3"
+                ></textarea>
+                <button id="generateBtn" class="generate-button">Generate</button>
+                <div class="toggle-container">
+                    <button id="componentBtn" class="toggle-button">Component</button>
+                    <button id="fullProjectBtn" class="toggle-button">Full Project</button>
+                </div>
             </div>
-            <form id="login-form">
-                <div class="form-group">
-                    <label for="login-email">Email</label>
-                    <input type="email" id="login-email" required>
-                </div>
-                <div class="form-group">
-                    <label for="login-password">Password</label>
-                    <input type="password" id="login-password" required>
-                </div>
-                <button type="submit" class="btn-primary">Login</button>
-            </form>
-            <p class="modal-footer">
-                Don't have an account? <a href="#" id="switch-to-signup">Sign up</a>
-            </p>
         </div>
     </div>
-
-    <div id="signup-modal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Sign Up</h2>
-                <button class="modal-close">&times;</button>
-            </div>
-            <form id="signup-form">
-                <div class="form-group">
-                    <label for="signup-username">Username</label>
-                    <input type="text" id="signup-username" required>
-                </div>
-                <div class="form-group">
-                    <label for="signup-email">Email</label>
-                    <input type="email" id="signup-email" required>
-                </div>
-                <div class="form-group">
-                    <label for="signup-password">Password</label>
-                    <input type="password" id="signup-password" required>
-                </div>
-                <div class="form-group">
-                    <label for="signup-confirm-password">Confirm Password</label>
-                    <input type="password" id="signup-confirm-password" required>
-                </div>
-                <button type="submit" class="btn-primary">Sign Up</button>
-            </form>
-            <p class="modal-footer">
-                Already have an account? <a href="#" id="switch-to-login">Login</a>
-            </p>
-        </div>
-    </div>
-
-    <!-- Scripts -->
-    <!-- Load utility classes first -->
-    <script src="js/notifications.js"></script>
-    <script src="js/loading.js"></script>
-    
-    <!-- Load main components -->
     <script src="js/file-explorer.js"></script>
-    <script src="js/editor.js"></script>
-    <script src="js/preview.js"></script>
-    
-    <!-- Load main app last -->
+    <script src="js/monaco-config.js"></script>
     <script src="js/main.js"></script>
-
-    <!-- Monaco Editor Setup -->
-    <script>
-        require.config({
-            paths: {
-                vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs'
-            }
-        });
-
-        window.MonacoEnvironment = {
-            getWorkerUrl: function(workerId, label) {
-                return `data:text/javascript;charset=utf-8,${encodeURIComponent(`
-                    self.MonacoEnvironment = {
-                        baseUrl: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/'
-                    };
-                    importScripts('https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/base/worker/workerMain.js');
-                `)}`;
-            }
-        };
-    </script>
 </body>
 </html> 

@@ -1,0 +1,457 @@
+/* Base styles */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color: #1E1E1E;
+    color: #CCCCCC;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+}
+
+/* Layout */
+.main-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Files Section */
+.files-section {
+    width: 240px;
+    background-color: #1E1E1E;
+    border-right: 1px solid #3C3C3C;
+    display: flex;
+    flex-direction: column;
+}
+
+.files-header {
+    padding: 12px;
+    border-bottom: 1px solid #3C3C3C;
+}
+
+/* Editor Section */
+.editor-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #1E1E1E;
+}
+
+.editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+}
+
+.editor-actions {
+    display: flex;
+    gap: 8px;
+}
+
+#monaco-editor {
+    flex: 1;
+    background-color: #1E1E1E;
+}
+
+/* Console Section */
+.console-section {
+    height: 128px;
+    border-top: 1px solid #3C3C3C;
+}
+
+.console-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 12px;
+}
+
+#consoleOutput {
+    height: calc(100% - 28px);
+    overflow-y: auto;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 13px;
+    padding: 8px;
+}
+
+/* Assistant Section */
+.assistant-section {
+    width: 320px;
+    background-color: #1E1E1E;
+    border-left: 1px solid #3C3C3C;
+    display: flex;
+    flex-direction: column;
+}
+
+.assistant-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* Common Elements */
+.section-title {
+    font-size: 13px;
+    color: #CCCCCC;
+    margin-bottom: 12px;
+}
+
+/* Buttons */
+.new-file-button {
+    width: 100%;
+    padding: 8px 12px;
+    background-color: #0078D4;
+    border: none;
+    border-radius: 4px;
+    color: #FFFFFF;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.new-file-button:hover {
+    background-color: #1B8DE4;
+}
+
+#fileList {
+    padding: 8px;
+    overflow-y: auto;
+}
+
+.file-item {
+    display: flex;
+    align-items: center;
+    padding: 6px 8px;
+    margin: 2px 0;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #CCCCCC;
+    background-color: transparent;
+    transition: all 0.2s;
+}
+
+.file-item:hover {
+    background-color: #2A2D2E;
+}
+
+.file-item.active {
+    background-color: #37373D;
+}
+
+.file-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    object-fit: contain;
+}
+
+.file-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.delete-button {
+    opacity: 0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: #CCCCCC;
+    background: transparent;
+    transition: all 0.2s;
+}
+
+.file-item:hover .delete-button {
+    opacity: 1;
+}
+
+.delete-button:hover {
+    background-color: #C53030;
+    color: white;
+}
+
+/* Scrollbar for file list */
+#fileList::-webkit-scrollbar {
+    width: 6px;
+}
+
+#fileList::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#fileList::-webkit-scrollbar-thumb {
+    background: #424242;
+    border-radius: 3px;
+}
+
+#fileList::-webkit-scrollbar-thumb:hover {
+    background: #4F4F4F;
+}
+
+/* File type indicators */
+.file-item[data-type="python"] .file-icon { color: #3776AB; }
+.file-item[data-type="javascript"] .file-icon { color: #F7DF1E; }
+.file-item[data-type="html"] .file-icon { color: #E34F26; }
+.file-item[data-type="css"] .file-icon { color: #1572B6; }
+.file-item[data-type="java"] .file-icon { color: #007396; }
+.file-item[data-type="cpp"] .file-icon { color: #00599C; }
+
+.editor-button {
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #CCCCCC;
+}
+
+.editor-button.run { background-color: #2EA043; }
+.editor-button.copy { background-color: #0078D4; }
+.editor-button.download { background-color: #8957E5; }
+.editor-button.save { background-color: #D29922; }
+
+.clear-button {
+    font-size: 12px;
+    color: #808080;
+}
+
+.clear-button:hover {
+    color: #CCCCCC;
+}
+
+/* Chat Elements */
+#chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.chat-message {
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: 85%;
+}
+
+.user-message {
+    background: #2D3748;
+    color: #E2E8F0;
+    margin-left: auto;
+    border-radius: 12px 12px 2px 12px;
+}
+
+.ai-message {
+    background: #1A365D;
+    color: #E2E8F0;
+    margin-right: auto;
+    border-radius: 12px 12px 12px 2px;
+}
+
+.chat-input-container {
+    padding: 16px;
+    border-top: 1px solid #3C3C3C;
+    background-color: #1E1E1E;
+}
+
+#userInput {
+    width: 100%;
+    background-color: #2D2D2D;
+    border: 1px solid #3C3C3C;
+    border-radius: 8px;
+    padding: 12px;
+    color: #E2E8F0;
+    font-size: 13px;
+    resize: none;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+}
+
+#userInput:focus {
+    outline: none;
+    border-color: #0078D4;
+}
+
+.generate-button {
+    width: 100%;
+    padding: 8px;
+    background-color: #0078D4;
+    border: none;
+    border-radius: 6px;
+    color: #FFFFFF;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.generate-button:hover {
+    background-color: #1B8DE4;
+}
+
+.toggle-container {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.toggle-button {
+    flex: 1;
+    padding: 6px;
+    background-color: #2D2D2D;
+    border: 1px solid #3C3C3C;
+    border-radius: 6px;
+    color: #CCCCCC;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.toggle-button:hover {
+    background-color: #3D3D3D;
+}
+
+.toggle-button.active {
+    background-color: #0078D4;
+    color: #FFFFFF;
+    border-color: #0078D4;
+}
+
+/* Add typing animation for AI messages */
+.typing-indicator {
+    display: flex;
+    gap: 4px;
+    padding: 8px;
+}
+
+.typing-dot {
+    width: 6px;
+    height: 6px;
+    background: #0078D4;
+    border-radius: 50%;
+    animation: typing 1.4s infinite;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+/* Hover States */
+.new-file-button:hover { background-color: #3D3D3D; }
+.editor-button:hover { filter: brightness(1.2); }
+.generate-button:hover { background-color: #1B8DE4; }
+.toggle-button:hover { background-color: #3D3D3D; }
+.toggle-button.active { background-color: #0078D4; }
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1E1E1E;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #424242;
+    border: 2px solid #1E1E1E;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #4F4F4F;
+}
+
+/* Add to your existing styles */
+#no-file-message {
+    background-color: #1E1E1E;
+    color: #6B7280;
+    height: 100%;
+}
+
+#no-file-message p {
+    margin: 0;
+}
+
+#editor-view {
+    height: 100%;
+}
+
+/* Ensure proper flex behavior */
+.editor-section {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Add to your existing styles */
+.file-lang-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 35px;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: bold;
+    margin-right: 8px;
+    font-family: 'Consolas', 'Monaco', monospace;
+}
+
+.file-lang-icon.javascript {
+    background-color: #F7DF1E;
+    color: #000000;
+}
+
+.file-lang-icon.python {
+    background-color: #3776AB;
+    color: #FFFFFF;
+}
+
+.file-lang-icon.html {
+    background-color: #E34F26;
+    color: #FFFFFF;
+}
+
+.file-lang-icon.css {
+    background-color: #1572B6;
+    color: #FFFFFF;
+}
+
+.file-lang-icon.java {
+    background-color: #007396;
+    color: #FFFFFF;
+}
+
+.file-lang-icon.cpp {
+    background-color: #00599C;
+    color: #FFFFFF;
+}
+
+.file-lang-icon.c {
+    background-color: #A8B9CC;
+    color: #000000;
+}
+
+.file-lang-icon.json {
+    background-color: #000000;
+    color: #FFFFFF;
+}
+
+.file-lang-icon.markdown {
+    background-color: #083FA1;
+    color: #FFFFFF;
+}
+
+.file-lang-icon.text {
+    background-color: #4D4D4D;
+    color: #FFFFFF;
+}
+ 

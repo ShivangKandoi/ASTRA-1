@@ -1,0 +1,22 @@
+{
+    "watch": [
+        "server/",
+        ".env"
+    ],
+    "ext": "js,py,json,env",
+    "ignore": [
+        "node_modules/",
+        "client/"
+    ],
+    "env": {
+        "NODE_ENV": "development"
+    },
+    "execMap": {
+        "js": "node"
+    },
+    "events": {
+        "restart": "clear"
+    },
+    "colours": true,
+    "verbose": true
+} 
